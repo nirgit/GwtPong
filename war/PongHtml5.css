@@ -40,3 +40,13 @@ h1 {
 	width: 100% ;
 	position: absolute ;
 }
+
+.restart-button {
+	border: 		solid 5px;
+	border-color: 	#FA5A78;
+	font-weight: 	bold;
+	margin-left: 	490px;
+	margin-top: 	240px;
+	padding: 		15px;
+	position: 		fixed;
+}

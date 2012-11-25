@@ -14,13 +14,13 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 public class PongHtml5 implements EntryPoint {
 
 	private FlowPanel panel = new FlowPanel() ;
-	private Canvas canvas = null ;
+	private Canvas canvas 	= null ;
 	
 	/**
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		Label title = new Label("Pong powered by HTML5 GWT");
+		Label title = new Label("SpacePong powered by GWT's HTML5 API.");
 		
 		canvas = Canvas.createIfSupported() ;
 		canvas.setCoordinateSpaceWidth(1000) ;
@@ -32,7 +32,7 @@ public class PongHtml5 implements EntryPoint {
 		panel.add(canvas) ;
 		RootLayoutPanel.get().add(panel) ;
 		
-		final Game game = new Game(canvas) ;
+		final Game game = new Game(panel, canvas) ;
 		
 		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
 			@Override
