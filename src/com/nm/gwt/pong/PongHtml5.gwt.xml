@@ -12,6 +12,7 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
   <!-- Other module inherits                                      -->
+  <add-linker name="xsiframe" />
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='com.nm.gwt.pong.client.PongHtml5'/>

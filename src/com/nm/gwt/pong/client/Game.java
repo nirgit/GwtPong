@@ -6,8 +6,6 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.user.client.Random;
@@ -83,8 +81,6 @@ public class Game {
 	 * @param canvas
 	 */
 	private void bind(final Canvas canvas) {
-		// add keyboard input controls
-		bindKeyboardControls(canvas);
 		// bind mouse controls
 		bindMouseControls(canvas) ;
 		// bind a restart button.
@@ -100,22 +96,6 @@ public class Game {
 				if(yCoordinate > canvas.getCoordinateSpaceHeight()-Pad.getHeight())
 					yCoordinate = canvas.getCoordinateSpaceHeight()-Pad.getHeight() ;
 				player.setY(yCoordinate) ;
-			}
-		}) ;
-	}
-
-	private void bindKeyboardControls(final Canvas canvas) {
-		canvas.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(event.isDownArrow()) {
-					player.down() ;
-					int LOWER_BOUND = canvas.getCoordinateSpaceHeight()-Pad.getHeight();
-					player.setY(Math.min(player.getY(), LOWER_BOUND)) ;
-				} else if(event.isUpArrow()) {
-					player.up() ;
-					player.setY(Math.max(player.getY(), 0)) ;
-				}
 			}
 		}) ;
 	}
