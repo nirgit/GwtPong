@@ -65,7 +65,7 @@ public class Game {
 
 	private void initRestartButton() {
 		this.restart	= new Button("Restart") ;
-		this.restart.addStyleName("restart-button") ;
+		this.restart.setStyleName("restart-button") ;
 	}
 
 	private void nextRandomYTarget() {
