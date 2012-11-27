@@ -8,7 +8,7 @@
 
 .game-canvas {
 	background: center ;
-	background-image: url("../imgs/bg.jpg") ;
+	background-image: url("imgs/bg.jpg") ;
 	background-repeat: no-repeat;
 	width: 100% ;
 	position: absolute ;

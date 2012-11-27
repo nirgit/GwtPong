@@ -172,8 +172,6 @@ public class Game {
 			// make sure ball goes to the other direction.
 			ball.setDirectionToComputer() ;
 			ball.setX(player.getX() + Pad.getWidth()) ;
-			// render score board!
-			scoreBoard.draw(canvas.getContext2d()) ;
 		}
 		// if the ball hits the computer's side
 		if(ball.getX() >= canvas.getCoordinateSpaceWidth() - Pad.getWidth() && !computer.isHit(ball.getY())) {
@@ -181,8 +179,6 @@ public class Game {
 			// make sure ball goes to the other direction.
 			ball.setDirectionToPlayer() ;
 			ball.setX(computer.getX() - Pad.getWidth()) ;
-			// render score board!
-			scoreBoard.draw(canvas.getContext2d()) ;
 		}
 	}
 
@@ -233,5 +229,6 @@ public class Game {
 		computer.draw(ctx) ;
 		player.draw(ctx) ;
 		ball.draw(ctx) ;
+		scoreBoard.draw(ctx) ;
 	}
 }
