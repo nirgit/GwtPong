@@ -5,8 +5,9 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.Context2d.LineCap;
 
 /**
- * @author NirLap
- *
+ * Date: 27/11/2012
+ * Description: Represents a Pad in the game.
+ * @author Nir Moav
  */
 public class Pad implements IDrawable {
 
@@ -18,6 +19,7 @@ public class Pad implements IDrawable {
 	private static final int PAD_WIDTH	= 50;
 	private static final int STEP		= 10;
 
+	// the last coordinates of the pad.
 	private int oldX ;
 	private int oldY ;
 
@@ -26,8 +28,8 @@ public class Pad implements IDrawable {
 
 	/**
 	 * C'tor
-	 * @param x
-	 * @param y
+	 * @param x the x coordinate of the pad.
+	 * @param y the y coordinate of the pad.
 	 */
 	public Pad(int x, int y) {
 		this.x 		= x;
@@ -53,6 +55,9 @@ public class Pad implements IDrawable {
 		this.y = y;
 	}
 
+	/**
+	 * @see com.nm.gwt.pong.client.model.IDrawable#draw(com.google.gwt.canvas.dom.client.Context2d)
+	 */
 	@Override
 	public void draw(Context2d ctx) {
 		ctx.save() ;

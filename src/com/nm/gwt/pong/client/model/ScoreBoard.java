@@ -4,8 +4,9 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.Context2d.TextAlign;
 
 /**
- * Represents the score board of the game.
- * @author NirLap
+ * Date: 27/11/2012
+ * Description: Represents the score board of the game.
+ * @author Nir Moav
  */
 public class ScoreBoard implements IDrawable {
 

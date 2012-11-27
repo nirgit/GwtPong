@@ -4,8 +4,9 @@ import com.google.gwt.canvas.dom.client.CanvasGradient;
 import com.google.gwt.canvas.dom.client.Context2d;
 
 /**
- * @author NirLap
- *
+ * Date: 27/11/2012
+ * Description: <b>Ball</b> - is a ball in the game
+ * @author Nir Moav 
  */
 public class Ball implements IDrawable {
 	
@@ -29,6 +30,8 @@ public class Ball implements IDrawable {
 	
 	/**
 	 * C'tor
+	 * @param x the x coordinate of the ball
+	 * @param y the y coordinate of the ball
 	 */
 	public Ball(int x, int y) {
 		this.x = x ;
