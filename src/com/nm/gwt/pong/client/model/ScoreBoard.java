@@ -16,11 +16,14 @@ public class ScoreBoard implements IDrawable {
 	
 	private int player ;
 	private int computer ;
+	private int pointsToWin;
 	
 	/**
 	 * C'tor
+	 * @param pointsToWin 
 	 */
-	public ScoreBoard() {
+	public ScoreBoard(int pointsToWin) {
+		this.pointsToWin = pointsToWin;
 		reset() ;
 	}
 	
@@ -38,7 +41,7 @@ public class ScoreBoard implements IDrawable {
 	}
 
 	public boolean isGameOver() {
-		return this.player >= 3 || this.computer >=3 ;
+		return this.player >= pointsToWin || this.computer >= pointsToWin ;
 	}
 	
 	@Override

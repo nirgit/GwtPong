@@ -28,17 +28,23 @@ public class Ball implements IDrawable {
 	private int x ;
 	private int y ;
 	
+	private final int speed; 
+	private int targetY = 0 ;
+	
 	/**
 	 * C'tor
 	 * @param x the x coordinate of the ball
 	 * @param y the y coordinate of the ball
+	 * @param speed the speed of the ball.
 	 */
-	public Ball(int x, int y) {
+	public Ball(int x, int y, int speed) {
 		this.x = x ;
 		this.oldX = x ;
 		
 		this.y = y ;
 		this.oldY = y ;
+		
+		this.speed = speed ;
 	}
 
 	public int getX() {
@@ -55,6 +61,14 @@ public class Ball implements IDrawable {
 
 	public void setY(int y) {
 		this.y = y;
+	}
+	
+	public int getTargetY() {
+		return targetY;
+	}
+
+	public void setTargetY(int targetY) {
+		this.targetY = targetY;
 	}
 
 	@Override
@@ -115,5 +129,9 @@ public class Ball implements IDrawable {
 
 	public boolean isComputerDirection() {
 		return direction > 0 ;
+	}
+
+	public int getSpeed() {
+		return this.speed ;
 	}
 }

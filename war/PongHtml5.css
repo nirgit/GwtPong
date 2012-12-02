@@ -3,7 +3,6 @@
  *  You should use CssResource in order to reduce the HTTP round-trip calls & to perform GWT "minification". 
  */
 .game-panel {
-	margin: auto ;
 }
 
 .game-canvas {

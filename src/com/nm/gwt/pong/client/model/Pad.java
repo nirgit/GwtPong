@@ -15,8 +15,8 @@ public class Pad implements IDrawable {
 	private static final String COLOR_SILVER 	= "silver" ;
 	private static final String COLOR_WHITE 	= "white" ;
 
-	private static final int PAD_HEIGHT	= 200 ;
-	private static final int PAD_WIDTH	= 50;
+	private static final int PAD_HEIGHT	= 150 ;
+	private static final int PAD_WIDTH	= 30;
 	private static final int STEP		= 10;
 
 	// the last coordinates of the pad.

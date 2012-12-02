@@ -1,5 +1,8 @@
 package com.nm.gwt.pong.client;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.Scheduler;
@@ -10,8 +13,9 @@ import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.nm.gwt.pong.client.model.Ball;
+import com.nm.gwt.pong.client.model.GameLevel;
 import com.nm.gwt.pong.client.model.Pad;
 import com.nm.gwt.pong.client.model.ScoreBoard;
 
@@ -22,11 +26,10 @@ import com.nm.gwt.pong.client.model.ScoreBoard;
  */
 public class Game {
 
-	private final static int FPS 			= 25 ; 
-	private final static int BALL_SPEED 	= 12 ;
-	private final static int COMPUTER_SPEED = 3 ;
-	
-	private final FlowPanel container;
+	private final static int FPS 	= 25 ; 
+	private GameLevel level 		= null ;
+
+	private final Panel container;
 	private final Canvas canvas;
 
 	// a restart button, to use when the game is finished.
@@ -35,30 +38,47 @@ public class Game {
 	
 	private final Pad computer ;
 	private final Pad player ;
-	private final Ball ball ;
 	
-	// the Y coordinate which the ball is heading to.
-	private int targetY = 0 ;
-	
+	private Set<Ball> balls ;
+	// a flag indicating if the game is stopped.
+	private boolean isStopped ;
 	
 	/**
 	 * c'tor
 	 * @param container the container panel of the game.  
 	 * @param canvas the canvas where the game is played.
 	 */
-	public Game(FlowPanel container, Canvas canvas) {
+	public Game(Panel container, Canvas canvas, GameLevel level) {
 		this.container	= container ;
 		this.canvas 	= canvas;
+		this.level		= level ;
+		this.isStopped	= false ;
 		// Initialize game elements.
 		int middleY 	= (canvas.getCoordinateSpaceHeight()-Pad.getHeight())/2;
-		this.player 	= new Pad(0, middleY) ; 
 		int endX 		= canvas.getCoordinateSpaceWidth() - Pad.getWidth() ;
+		this.player 	= new Pad(0, middleY) ; 
 		this.computer 	= new Pad(endX, middleY) ;
-		this.ball		= new Ball(endX/2, middleY) ;
-		this.scoreBoard = new ScoreBoard() ;
 		initRestartButton();
 		// bind logics.
 		bind(canvas) ;
+	}
+	
+	public void setLevel(GameLevel level) {
+		this.level = level;
+	}
+
+	/**
+	 * Initializes the balls at X & Y coordinates.
+	 * @param x
+	 * @param y
+	 */
+	private void initBalls(int x, int y) {
+		int lowestBallSpeed = level.getHighestBallsSpeed()/2 ;
+		this.balls = new HashSet<Ball>() ;
+		for(int i=0 ; i < level.getNumberOfBalls() ; i++) {
+			Ball ball = new Ball(x, y, Random.nextInt(lowestBallSpeed) + lowestBallSpeed) ;
+			balls.add(ball) ;
+		}
 	}
 
 	/**
@@ -72,8 +92,8 @@ public class Game {
 	/**
 	 * Picks a random Y coordinate for the ball to head to.
 	 */
-	private void nextRandomYTarget() {
-		this.targetY = Random.nextInt(canvas.getCoordinateSpaceHeight()) ;
+	private void nextRandomYTarget(Ball ball) {
+		ball.setTargetY(Random.nextInt(canvas.getCoordinateSpaceHeight())) ;
 	}
 
 	/**
@@ -108,8 +128,7 @@ public class Game {
 	 * Start the game.
 	 */
 	public void start() {
-		// randomize the next Y value target.
-		nextRandomYTarget();
+		initGame();
 		// start the game
 		Scheduler.get().scheduleFixedPeriod(new RepeatingCommand() {
 			@Override
@@ -123,11 +142,32 @@ public class Game {
 				if(isGameOver) { 
 					showRestart() ;
 					return false ;
+				} else if (isStopped){
+					return false ;
 				} else {
 					return true ;
 				}
 			}
 		}, 1000 / FPS) ;
+	}
+
+	private void initGame() {
+		this.isStopped 	= false ; 
+		// clear canvas.
+		this.canvas.getContext2d().clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight()) ;
+		// remove restart button
+		restart.removeFromParent() ;
+		int middleY 	= (canvas.getCoordinateSpaceHeight()-Pad.getHeight())/2;
+		int endX 		= canvas.getCoordinateSpaceWidth() - Pad.getWidth() ;
+		initBalls(endX/2, middleY);
+		this.scoreBoard = new ScoreBoard(level.getNumberOfBalls() * 3) ;
+		// randomize the next Y value target for all balls.
+		for(Ball b : this.balls)
+			nextRandomYTarget(b);
+	}
+	
+	public void stop() {
+		this.isStopped = true ;
 	}
 
 	/**
@@ -142,9 +182,7 @@ public class Game {
 		restart.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				scoreBoard.reset() ;
 				start() ;
-				restart.removeFromParent() ;
 			}
 		}) ;
 	}
@@ -154,18 +192,28 @@ public class Game {
 	 * updates the state of the ball & computer's pad.
 	 */
 	private void updateState() {
-		// update the ball's X & Y coordinates.
-		updateBallCoordinates() ;
+		Ball closestBall = null ;
+		int x = -1 ;
+		for(Ball ball : this.balls) {
+			// update the ball's X & Y coordinates.
+			updateBallCoordinates(ball) ;
+			if(ball.getX() > x) { 
+				x = ball.getX() ;
+				closestBall = ball ;
+			}
+		}
 		// play the computer's move.
-		updateComputerPad() ;
+		updateComputerPad(closestBall) ;
 		// Check coordinates to see if a score update is needed.
-		checkCoords() ;
+		for(Ball ball : this.balls)
+			checkCoords(ball) ;
 	}
 
 	/**
 	 * Checks if computer or player scored.
+	 * @param ball 
 	 */
-	private void checkCoords() {
+	private void checkCoords(Ball ball) {
 		// if the ball hits the player's side
 		if(ball.getX() <= player.getX() + Pad.getWidth() && !player.isHit(ball.getY())) {
 			scoreBoard.incComputerScore() ;
@@ -185,37 +233,37 @@ public class Game {
 	/**
 	 * This is the computer playing.
 	 */
-	private void updateComputerPad() {
+	private void updateComputerPad(Ball ball) {
 		// check first if the ball is heading towards its pad. don't do anything if not.
 		if(!ball.isComputerDirection()) return ;
 		// the computer needs to aspire to get to the target Y, where the ball is heading.
 		int computerYCoordinate = computer.getY();
-		if(computerYCoordinate + Pad.getHeight() < targetY) {
-			computer.setY(computerYCoordinate + COMPUTER_SPEED) ;
-		} else if (computerYCoordinate > targetY) {
-			computer.setY(computerYCoordinate - COMPUTER_SPEED) ;
+		if(computerYCoordinate + Pad.getHeight() < ball.getTargetY()) {
+			computer.setY(computerYCoordinate + level.getComputerSpeed()) ;
+		} else if (computerYCoordinate > ball.getTargetY()) {
+			computer.setY(computerYCoordinate - level.getComputerSpeed()) ;
 		}
 	}
 
 	/**
 	 * Updates the coordinates of the ball.
 	 */
-	private void updateBallCoordinates() {
+	private void updateBallCoordinates(Ball ball) {
 		int direction = ball.getDirection() ;
-		int nextX = ball.getX() + direction * BALL_SPEED ;
+		int nextX = ball.getX() + direction * ball.getSpeed() ;
 		if(nextX < Pad.getWidth()) {
 			ball.setDirectionToComputer() ;
-			nextRandomYTarget() ;
+			nextRandomYTarget(ball) ;
 			nextX = Pad.getWidth() ;
 		} else if(nextX > canvas.getCoordinateSpaceWidth() - Pad.getWidth()){
 			ball.setDirectionToPlayer() ;
-			nextRandomYTarget() ;
+			nextRandomYTarget(ball) ;
 			nextX = canvas.getCoordinateSpaceWidth() - Pad.getWidth() ;
 		}
 		// calculate next Y of the ball... some algebra...
 		double targetX	= (ball.isComputerDirection() ? canvas.getCoordinateSpaceWidth() - Pad.getWidth() : Pad.getWidth()) ;
-		double tilt		= (double)(targetY - ball.getY()) / (targetX - ball.getX()) ;
-		double nextY	= targetY - tilt * (targetX - nextX) ;
+		double tilt		= (double)(ball.getTargetY() - ball.getY()) / (targetX - ball.getX()) ;
+		double nextY	= ball.getTargetY() - tilt * (targetX - nextX) ;
 		// set next Y & X
 		ball.setY((int)nextY) ;
 		ball.setX(nextX) ;
@@ -228,7 +276,8 @@ public class Game {
 		Context2d ctx = canvas.getContext2d() ;
 		computer.draw(ctx) ;
 		player.draw(ctx) ;
-		ball.draw(ctx) ;
+		for(Ball ball : this.balls)
+			ball.draw(ctx) ;
 		scoreBoard.draw(ctx) ;
 	}
 }
