@@ -49,7 +49,6 @@ public class PongHtml5 implements EntryPoint {
 		canvas.setPixelSize(1000, 500) ;
 		// set canvas' style
 		canvas.addStyleName("game-canvas") ;
-		game = new Game(panel, canvas, GameLevel.EASY) ;
 		// add the contents to the game panel.
 		panel.add(GAME_TITLE) ;
 		panel.add(levelPicker) ;
@@ -81,6 +80,8 @@ public class PongHtml5 implements EntryPoint {
 	 * @param gameLevel a game level.
 	 */
 	private void startGame(GameLevel gameLevel) {
+		if(game == null)
+			game = new Game(panel, canvas, gameLevel) ;
 		// stop current game.
 		this.game.stop() ;
 		// set the level

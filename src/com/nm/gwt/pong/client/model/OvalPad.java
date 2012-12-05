@@ -3,20 +3,21 @@ package com.nm.gwt.pong.client.model;
 import com.google.gwt.canvas.dom.client.CanvasGradient;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.Context2d.LineCap;
+import com.nm.gwt.pong.client.model.IDrawable;
 
 /**
  * Date: 27/11/2012
  * Description: Represents a Pad in the game.
  * @author Nir Moav
  */
-public class Pad implements IDrawable {
+public class OvalPad implements IDrawable {
+
+	public static final int HEIGHT	= 150 ;
+	public static final int WIDTH	= 20;
 
 	private static final String COLOR_BLACK		= "black" ;
-	private static final String COLOR_SILVER 	= "silver" ;
 	private static final String COLOR_WHITE 	= "white" ;
 
-	private static final int PAD_HEIGHT	= 150 ;
-	private static final int PAD_WIDTH	= 30;
 	private static final int STEP		= 10;
 
 	// the last coordinates of the pad.
@@ -31,7 +32,7 @@ public class Pad implements IDrawable {
 	 * @param x the x coordinate of the pad.
 	 * @param y the y coordinate of the pad.
 	 */
-	public Pad(int x, int y) {
+	public OvalPad(int x, int y) {
 		this.x 		= x;
 		this.oldX 	= x;
 		
@@ -62,25 +63,15 @@ public class Pad implements IDrawable {
 	public void draw(Context2d ctx) {
 		ctx.save() ;
 		// clear left overs from before.
-		ctx.clearRect(oldX-1, oldY-1, PAD_WIDTH+2, PAD_HEIGHT+2) ;
+		ctx.clearRect(oldX-WIDTH-1, oldY-WIDTH-1, 2+WIDTH*2, 2+HEIGHT+WIDTH*2) ;
 		// move to new position.
 		ctx.translate(x, y) ;
 		// draw the pad's body.
 		drawPadBody(ctx);
-		drawPadBorder(ctx);
 		// update the rendered ("old") coordinates
 		oldX = x ;
 		oldY = y ;
 		ctx.restore() ;
-	}
-
-	private void drawPadBorder(Context2d ctx) {
-		ctx.beginPath() ;
-		ctx.setLineCap(LineCap.ROUND) ;
-		ctx.setStrokeStyle(COLOR_WHITE) ;
-		ctx.setLineWidth(2) ;
-		ctx.strokeRect(0, 0, PAD_WIDTH, PAD_HEIGHT) ;
-		ctx.closePath() ;
 	}
 
 	private void drawPadBody(Context2d ctx) {
@@ -88,25 +79,26 @@ public class Pad implements IDrawable {
 		ctx.setLineCap(LineCap.ROUND) ;
 		ctx.setStrokeStyle(COLOR_WHITE) ;
 		ctx.setLineWidth(2) ;
-		ctx.lineTo(0, PAD_HEIGHT) ;
-		ctx.arc(0, PAD_HEIGHT, PAD_WIDTH/2, 0, Math.PI, false) ; 
-		ctx.lineTo(PAD_WIDTH, 0) ;
-		ctx.arc(PAD_WIDTH, 0, PAD_WIDTH/2, Math.PI, 0, false) ;
-		CanvasGradient gradient = ctx.createLinearGradient(0, 0, PAD_WIDTH, 0) ;
-		gradient.addColorStop(0f, 	COLOR_SILVER) ;
+		ctx.arc(0, 0, WIDTH, Math.PI , 0, false) ; 
+		ctx.lineTo(WIDTH, HEIGHT) ;
+		ctx.arc(0, HEIGHT, WIDTH, 0, Math.PI, false) ;
+		ctx.lineTo(-WIDTH, 0) ;
+		CanvasGradient gradient = ctx.createLinearGradient(-WIDTH, 0, WIDTH, 0) ;
+		gradient.addColorStop(0f, 	COLOR_WHITE) ;
 		gradient.addColorStop(0.5f, COLOR_BLACK) ;
-		gradient.addColorStop(1, 	COLOR_SILVER) ;
+		gradient.addColorStop(1, 	COLOR_WHITE) ;
 		ctx.setFillStyle(gradient) ;
+		ctx.fill() ;
 		ctx.stroke() ;
 		ctx.closePath() ;
 	}
 
-	public static int getHeight() {
-		return PAD_HEIGHT ;
+	public int getHeight() {
+		return HEIGHT ;
 	}
 
-	public static int getWidth() {
-		return PAD_WIDTH ;
+	public int getWidth() {
+		return WIDTH ;
 	}
 	
 	public void down() {
@@ -117,12 +109,19 @@ public class Pad implements IDrawable {
 		y = y - STEP ;
 	}
 
-	/**
-	 * @param y
-	 * @return true iff the given y is in the range of the pad.
-	 */
-	public boolean isHit(int y) {
-		return this.y < y && this.y + Pad.PAD_HEIGHT > y ;
+	public boolean isHitY(int y) {
+		return this.y - getHeight() <= y && this.y + getHeight() >= y ;
 	}
 
+	public boolean isHitX(int x) {
+		return this.x - getWidth() <= x && x <= this.x + getWidth() ;
+	}
+	
+	public boolean isHit(Ball ball) {
+		return isHitY(ball.getY()) && isHitX(ball.getX()) ;
+	}
+
+	public boolean isMiss(Ball ball) {
+		return !isHit(ball) ;
+	}
 }

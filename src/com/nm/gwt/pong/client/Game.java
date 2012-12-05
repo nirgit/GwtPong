@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Panel;
 import com.nm.gwt.pong.client.model.Ball;
 import com.nm.gwt.pong.client.model.GameLevel;
+import com.nm.gwt.pong.client.model.OvalPad;
 import com.nm.gwt.pong.client.model.Pad;
 import com.nm.gwt.pong.client.model.ScoreBoard;
 
@@ -36,8 +37,8 @@ public class Game {
 	private Button restart ;
 	private ScoreBoard scoreBoard ;
 	
-	private final Pad computer ;
-	private final Pad player ;
+	private final OvalPad computer ;
+	private final OvalPad player ;
 	
 	private Set<Ball> balls ;
 	// a flag indicating if the game is stopped.
@@ -54,10 +55,10 @@ public class Game {
 		this.level		= level ;
 		this.isStopped	= false ;
 		// Initialize game elements.
-		int middleY 	= (canvas.getCoordinateSpaceHeight()-Pad.getHeight())/2;
+		int middleY 	= (canvas.getCoordinateSpaceHeight() - Pad.getHeight())/2;
 		int endX 		= canvas.getCoordinateSpaceWidth() - Pad.getWidth() ;
-		this.player 	= new Pad(0, middleY) ; 
-		this.computer 	= new Pad(endX, middleY) ;
+		this.player 	= new OvalPad(2*OvalPad.WIDTH, middleY) ; 
+		this.computer 	= new OvalPad(endX-OvalPad.WIDTH, middleY) ;
 		initRestartButton();
 		// bind logics.
 		bind(canvas) ;
@@ -215,18 +216,12 @@ public class Game {
 	 */
 	private void checkCoords(Ball ball) {
 		// if the ball hits the player's side
-		if(ball.getX() <= player.getX() + Pad.getWidth() && !player.isHit(ball.getY())) {
+		if(player.getX() + player.getWidth() >= ball.getX() && player.isMiss(ball)) {
 			scoreBoard.incComputerScore() ;
-			// make sure ball goes to the other direction.
-			ball.setDirectionToComputer() ;
-			ball.setX(player.getX() + Pad.getWidth()) ;
 		}
 		// if the ball hits the computer's side
-		if(ball.getX() >= canvas.getCoordinateSpaceWidth() - Pad.getWidth() && !computer.isHit(ball.getY())) {
+		if(computer.getX() - computer.getWidth() <= ball.getX() && computer.isMiss(ball)) {
 			scoreBoard.incPlayerScore() ;
-			// make sure ball goes to the other direction.
-			ball.setDirectionToPlayer() ;
-			ball.setX(computer.getX() - Pad.getWidth()) ;
 		}
 	}
 
@@ -238,9 +233,9 @@ public class Game {
 		if(!ball.isComputerDirection()) return ;
 		// the computer needs to aspire to get to the target Y, where the ball is heading.
 		int computerYCoordinate = computer.getY();
-		if(computerYCoordinate + Pad.getHeight() < ball.getTargetY()) {
+		if(computerYCoordinate + Pad.getHeight() <= ball.getTargetY()) {
 			computer.setY(computerYCoordinate + level.getComputerSpeed()) ;
-		} else if (computerYCoordinate > ball.getTargetY()) {
+		} else if (computerYCoordinate >= ball.getTargetY()) {
 			computer.setY(computerYCoordinate - level.getComputerSpeed()) ;
 		}
 	}
@@ -251,15 +246,16 @@ public class Game {
 	private void updateBallCoordinates(Ball ball) {
 		int direction = ball.getDirection() ;
 		int nextX = ball.getX() + direction * ball.getSpeed() ;
-		if(nextX < Pad.getWidth()) {
+		if((nextX < player.getX() + player.getWidth() && player.isMiss(ball)) || player.isHit(ball)) {
 			ball.setDirectionToComputer() ;
 			nextRandomYTarget(ball) ;
-			nextX = Pad.getWidth() ;
-		} else if(nextX > canvas.getCoordinateSpaceWidth() - Pad.getWidth()){
+			// ensure the ball does not stay in the "scoring" area
+		} else if((nextX > computer.getX() - computer.getWidth() && computer.isMiss(ball)) || computer.isHit(ball)){
 			ball.setDirectionToPlayer() ;
 			nextRandomYTarget(ball) ;
-			nextX = canvas.getCoordinateSpaceWidth() - Pad.getWidth() ;
+			// ensure the ball does not stay in the "scoring" area
 		}
+		
 		// calculate next Y of the ball... some algebra...
 		double targetX	= (ball.isComputerDirection() ? canvas.getCoordinateSpaceWidth() - Pad.getWidth() : Pad.getWidth()) ;
 		double tilt		= (double)(ball.getTargetY() - ball.getY()) / (targetX - ball.getX()) ;
