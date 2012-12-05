@@ -7,12 +7,14 @@ import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.nm.gwt.pong.client.model.GameLevel;
+import com.nm.gwt.pong.client.model.GameMessage;
 
 /**
  * This is the entry point class of GWT.
@@ -51,11 +53,21 @@ public class PongHtml5 implements EntryPoint {
 		canvas.addStyleName("game-canvas") ;
 		// add the contents to the game panel.
 		panel.add(GAME_TITLE) ;
-		panel.add(levelPicker) ;
-		panel.add(startButton) ;
+		HorizontalPanel hp = new HorizontalPanel() ;
+		hp.add(levelPicker) ;
+		hp.add(startButton) ;
+		panel.add(hp) ;
 		panel.add(canvas) ;
 		// add the game panel to the body of the HTML hosting page.
 		RootLayoutPanel.get().add(panel) ;
+		// set message.
+		showWelcomeMessage();
+	}
+
+	private void showWelcomeMessage() {
+		String welcomeMessage = "Welcome to Space-Pong!\nPick a level to play.";
+		GameMessage message = new GameMessage(welcomeMessage, canvas.getCoordinateSpaceWidth(), true) ;
+		message.draw(canvas.getContext2d()) ;
 	}
 
 	/**

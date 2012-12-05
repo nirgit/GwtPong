@@ -110,7 +110,7 @@ public class OvalPad implements IDrawable {
 	}
 
 	public boolean isHitY(int y) {
-		return this.y - getHeight() <= y && this.y + getHeight() >= y ;
+		return this.y <= y && y <= this.y + getHeight() ;
 	}
 
 	public boolean isHitX(int x) {

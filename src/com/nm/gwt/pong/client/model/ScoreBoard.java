@@ -44,6 +44,14 @@ public class ScoreBoard implements IDrawable {
 		return this.player >= pointsToWin || this.computer >= pointsToWin ;
 	}
 	
+	public boolean didPlayerWin() {
+		return isGameOver() && player > computer ;
+	}
+	
+	public boolean didComputerWin() {
+		return isGameOver() && player < computer ;
+	}
+	
 	@Override
 	public void draw(Context2d ctx) {
 		int positionY = 60 ;

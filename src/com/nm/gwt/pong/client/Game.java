@@ -16,6 +16,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Panel;
 import com.nm.gwt.pong.client.model.Ball;
 import com.nm.gwt.pong.client.model.GameLevel;
+import com.nm.gwt.pong.client.model.GameMessage;
 import com.nm.gwt.pong.client.model.OvalPad;
 import com.nm.gwt.pong.client.model.Pad;
 import com.nm.gwt.pong.client.model.ScoreBoard;
@@ -141,7 +142,7 @@ public class Game {
 				// while game is not over, continue.
 				boolean isGameOver = scoreBoard.isGameOver() ;
 				if(isGameOver) { 
-					showRestart() ;
+					showResults() ;
 					return false ;
 				} else if (isStopped){
 					return false ;
@@ -169,6 +170,27 @@ public class Game {
 	
 	public void stop() {
 		this.isStopped = true ;
+	}
+
+	/**
+	 * Show the results of the game.
+	 */
+	private void showResults() {
+		if(scoreBoard.didPlayerWin()) {
+			showMessage("You win!") ;
+		} else if(scoreBoard.didComputerWin()) {
+			showMessage("You lost!") ;
+		}
+		showRestart() ;
+	}
+	
+	/**
+	 * Displays a message on the screen.
+	 * @param message
+	 */
+	private void showMessage(String message) {
+		GameMessage gameMessage = new GameMessage(message);
+		gameMessage.draw(canvas.getContext2d()) ;
 	}
 
 	/**
